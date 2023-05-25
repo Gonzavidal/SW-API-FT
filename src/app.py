@@ -130,33 +130,61 @@ def user_favourites():
     favsP = Favourite_planet.query.all()
     favsC = Favourite_character.query.all()
 
-    favsListPlanet = list(map(lambda favourite_planet: favourite_planet.serialize(), favsP))
-    favsListChr = list(map(lambda favourite_character: favourite_character.serialize(), favsC))
+    favsListPlanet = [fav.serialize() for fav in favsP]
+    favsListChr = [fav.serialize() for fav in favsC]
 
-    return jsonify(favsListPlanet, favsListChr), 200
+    return jsonify({"favourite_planets": favsListPlanet, "favourite_characters": favsListChr}), 200
 
-@app.route('/favourites/planets/<int:id>', methods=['POST', 'DELETE'])
-def add_delete_fav_planet(id):
+
+@app.route('/favourites/user/<int:user_id>/planets/<int:planet_id>', methods=['POST', 'DELETE'])
+def add_delete_fav_planet_for_user(user_id, planet_id):
     if request.method == 'POST':
-        user = User.query.get(id)
+        user = User.query.get(user_id)
 
-        favourite = Favourite_planet()
-        favourite.planet_id = id
-        favourite.user = user.id
-        favourite.save()
+        if user:
+            favourite = Favourite_planet()
+            favourite.planet_id = planet_id
+            favourite.user_id = user.id
+            favourite.save()
 
-        return jsonify({"msg": "Planet has been added to the Rebellion"})
+            return jsonify({"msg": "Planet has been added to the Rebellion"})
+        else:
+            return jsonify({"error": "User not found"})
 
     elif request.method == 'DELETE':
-        favourite = Favourite_planet.query.filter_by(planet_id=id).first()
+        favourite = Favourite_planet.query.filter_by(user_id=user_id, planet_id=planet_id).first()
+
         if favourite:
             favourite.delete()
             return jsonify({"msg": "Planet has been removed from the Rebellion"})
         else:
-            return jsonify({"msg": "Planet is not in the Rebellion"})
+            return jsonify({"error": "Planet is not in the Rebellion"})
+
+@app.route('/favourites/user/<int:user_id>/characters/<int:character_id>', methods=['POST', 'DELETE'])
+def add_delete_fav_character_for_user(user_id, character_id):
+    if request.method == 'POST':
+        user = User.query.get(user_id)
+
+        if user:
+            favourite = Favourite_character()
+            favourite.character_id = character_id 
+            favourite.user_id = user.id
+            favourite.save()
+
+            return jsonify({"msg": "Character has been added to the Rebellion"})
+        else:
+            return jsonify({"error": "User not found"})
+
+    elif request.method == 'DELETE':
+        favourite = Favourite_character.query.filter_by(user_id=user_id, character_id=character_id).first()
+
+        if favourite:
+            favourite.delete()
+            return jsonify({"msg": "The Character has been removed from the Rebellion"})
+        else:
+            return jsonify({"error": "Character is not in the Rebellion"})
 
 
-# @app.route('/favourites/people/<int:people_id>', methods=['POST'])
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

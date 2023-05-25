@@ -115,6 +115,11 @@ class Favourite_character(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),primary_key=True)
     character_id = db.Column(db.Integer, db.ForeignKey("characters.id"), primary_key=True)
     
+    def serialize(self):
+        return{
+            "user_id": self.user_id,
+            "character_id": self.character_id
+        }
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -128,6 +133,12 @@ class Favourite_planet(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),primary_key=True)
     planet_id = db.Column(db.Integer, db.ForeignKey("planets.id"), primary_key=True)
     
+    def serialize(self):
+        return{
+            "user_id": self.user_id,
+            "planet_id": self.planet_id
+        }
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -135,3 +146,4 @@ class Favourite_planet(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
