@@ -99,7 +99,6 @@ def get_specific_planet(id):
 
     return jsonify(onePlanet.serialize()), 200
 
-
 @app.route('/planets', methods=['POST'])
 def add_planet():
     pltInfo = request.get_json()
